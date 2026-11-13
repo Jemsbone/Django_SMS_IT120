@@ -1,0 +1,207 @@
+{% extends 'sms_app/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- SMS Composition Form Column -->
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-white border-bottom py-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0 text-primary fw-bold">
+                        <i class="bi bi-pencil-square me-2"></i>Compose SMS Message
+                    </h5>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+                        Textlink Gateway
+                    </span>
+                </div>
+            </div>
+
+            <div class="card-body p-4">
+                <form method="POST" id="smsForm" novalidate>
+                    {% csrf_token %}
+
+                    <!-- Recipient Phone Number Field -->
+                    <div class="mb-3">
+                        <label for="{{ form.recipient.id_for_label }}" class="form-label fw-semibold">
+                            Recipient Mobile Number <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted">
+                                <i class="bi bi-phone"></i>
+                            </span>
+                            {{ form.recipient }}
+                        </div>
+                        <div class="form-text text-muted">
+                            Accepts Philippine format (<code>09XXXXXXXXX</code> or <code>+639XXXXXXXXX</code>) or International E.164.
+                        </div>
+                        {% if form.recipient.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.recipient.errors %}
+                                    <div><i class="bi bi-x-circle me-1"></i>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Message Body Field -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label for="{{ form.message.id_for_label }}" class="form-label fw-semibold mb-0">
+                                Message Content <span class="text-danger">*</span>
+                            </label>
+                            <span id="charCounterBadge" class="badge bg-secondary-subtle text-secondary border">
+                                <span id="charCount">0</span> / 160 chars (1 SMS)
+                            </span>
+                        </div>
+                        {{ form.message }}
+                        <div class="d-flex justify-content-between text-muted small mt-1">
+                            <span>Max 480 characters. Standard SMS = 160 characters.</span>
+                            <span id="segmentInfo" class="fw-semibold text-primary">1 credit</span>
+                        </div>
+                        {% if form.message.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.message.errors %}
+                                    <div><i class="bi bi-x-circle me-1"></i>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex flex-wrap gap-2 pt-2 border-top">
+                        <button type="submit" id="sendBtn" class="btn btn-primary px-4 py-2 fw-semibold d-flex align-items-center shadow-sm">
+                            <i class="bi bi-send-fill me-2" id="btnIcon"></i>
+                            <span id="btnText">Send SMS Message</span>
+                        </button>
+                        <button type="button" id="clearBtn" class="btn btn-outline-secondary px-3 py-2">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Clear Form
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Recent Logs Card -->
+        <div class="card shadow-sm border-0 rounded-3 mt-4">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold text-secondary">
+                    <i class="bi bi-clock-history me-2"></i>Recent Activity
+                </h6>
+                <a href="{% url 'sms_app:history' %}" class="small text-decoration-none">
+                    View Full Logs ({{ total_count }}) &rarr;
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_logs %}
+                    <div class="list-group list-group-flush">
+                        {% for log in recent_logs %}
+                            <div class="list-group-item py-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fw-semibold text-dark">{{ log.recipient }}</span>
+                                    {% if log.status == 'SENT' %}
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                            <i class="bi bi-check-circle me-1"></i>Sent ({{ log.response_code|default:"200" }})
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                            <i class="bi bi-x-circle me-1"></i>Failed ({{ log.response_code|default:"Err" }})
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <p class="mb-1 text-muted small text-truncate">{{ log.message }}</p>
+                                <span class="text-secondary small">{{ log.timestamp|date:"M d, Y h:i A" }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="p-4 text-center text-muted">
+                        <i class="bi bi-inbox fs-2 d-block mb-1"></i>
+                        No SMS messages sent yet. Use the form above to send your first message.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Preview & Guide Column -->
+    <div class="col-lg-5">
+        <!-- Live Smartphone Message Preview -->
+        <div class="card shadow-sm border-0 rounded-3 mb-4">
+            <div class="card-header bg-white border-bottom py-3">
+                <h6 class="mb-0 fw-bold text-dark">
+                    <i class="bi bi-phone-vibrate me-2 text-primary"></i>Live Message Preview
+                </h6>
+            </div>
+            <div class="card-body bg-light p-3">
+                <!-- Phone Mockup Container -->
+                <div class="phone-mockup border rounded-4 bg-white shadow-sm p-3 mx-auto" style="max-width: 320px;">
+                    <!-- Phone Notch & Status Bar -->
+                    <div class="d-flex justify-content-between align-items-center text-muted small mb-2 border-bottom pb-2">
+                        <span><i class="bi bi-signal me-1"></i>4G</span>
+                        <span class="fw-bold">Messages</span>
+                        <span><i class="bi bi-battery-full"></i></span>
+                    </div>
+
+                    <!-- Recipient Header -->
+                    <div class="text-center py-2 border-bottom mb-3">
+                        <div class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                            <i class="bi bi-person-fill fs-5"></i>
+                        </div>
+                        <div class="fw-bold mt-1 text-dark" id="previewRecipient">+63 9XX XXX XXXX</div>
+                        <div class="text-muted small">Textlink SMS</div>
+                    </div>
+
+                    <!-- Message Bubble Area -->
+                    <div class="chat-bubble-area py-3" style="min-height: 160px;">
+                        <div class="d-flex justify-content-end mb-2">
+                            <div class="preview-bubble bg-primary text-white p-3 rounded-4 shadow-sm" style="max-width: 85%; word-break: break-word;">
+                                <p class="mb-1" id="previewText">Your composed message will appear here in real-time...</p>
+                                <div class="text-end small opacity-75" id="previewTimestamp">Just now</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center text-muted small pt-2 border-top">
+                        <i class="bi bi-shield-check me-1 text-success"></i>Textlink Secure Transmission
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integration Guidelines Card -->
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-white border-bottom py-3">
+                <h6 class="mb-0 fw-bold text-dark">
+                    <i class="bi bi-info-circle me-2 text-primary"></i>IT 120 Project Guidelines
+                </h6>
+            </div>
+            <div class="card-body small">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        <strong>Database:</strong> Stored in PostgreSQL (<code>sms_db</code>).
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        <strong>SMS Gateway:</strong> Powered by Textlink REST API (<code>https://textlinksms.com/</code>).
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        <strong>Security:</strong> API credentials securely isolated via <code>.env</code>.
+                    </li>
+                    <li class="mb-0">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        <strong>Validation:</strong> Empty messages and invalid formats are rejected.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'sms_app/js/sms_counter.js' %}"></script>
+{% endblock %}
+
