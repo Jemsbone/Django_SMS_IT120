@@ -112,9 +112,9 @@ Unlike mock or ephemeral systems, all outbound SMS attempts—both successful de
 
 | Member Name | Student ID | Designated Project Role | Assigned Key Responsibilities |
 | :--- | :--- | :--- | :--- |
-| **Member 1 (Lead)** | `[Student ID 1]` | **Full-Stack Lead & Gateway Architect** | Django architecture, `settings.py` integration, `TextlinkSMSService` client, REST API payload handling, and `.env` security management. |
-| **Member 2** | `[Student ID 2]` | **Database Engineer & Backend Developer** | PostgreSQL / pgAdmin database modeling, `SMSLog` schema, migrations, Django Admin customization, and audit dashboard pagination/filtering. |
-| **Member 3** | `[Student ID 3]` | **Frontend Designer & QA Documentation Lead** | Bootstrap 5 UI, live JavaScript character counter, smartphone mock-up preview, unit test execution, and demonstration video production. |
+| **Member 1 (Lead)** | `Jembo Magbanua` | **Full-Stack Lead & Gateway Architect** | Django architecture, `settings.py` integration, `TextlinkSMSService` client, REST API payload handling, and `.env` security management. |
+| **Member 2** | `Jherzell Jane Sayahan` | **Database Engineer & Backend Developer** | PostgreSQL / pgAdmin database modeling, `SMSLog` schema, migrations, Django Admin customization, and audit dashboard pagination/filtering. |
+| **Member 3** | `Regine Paclibar` | **Frontend Designer & QA Documentation Lead** | Bootstrap 5 UI, live JavaScript character counter, smartphone mock-up preview, unit test execution, and demonstration video production. |
 
 ---
 
