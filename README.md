@@ -284,35 +284,6 @@ python manage.py test
 
 ---
 
-## 📹 Video Demonstration Guide & Checklist (3–10 Minutes)
-
-As required by Section VII (Submission and Demonstration Guidelines) of the assignment, the video must be **between 3 and 10 minutes** long. Use this suggested script:
-
-- [ ] **Part 1: Introduction (0:00 – 1:00)**
-  - Introduce the course: IT 120 (Integrative Programming and Technologies).
-  - Introduce group members and state each person's role.
-  - State project objective: A Django SMS dispatch web application integrated with the Textlink REST API and PostgreSQL.
-- [ ] **Part 2: Code Architecture & Security (1:00 – 2:30)**
-  - Show `.env` and `.env.example` to demonstrate secure API key handling.
-  - Walk through `sms_app/services.py` explaining how the Textlink REST API is called and how HTTP response codes are handled.
-  - Show `sms_app/models.py` and `SMSLog` database schema.
-- [ ] **Part 3: PostgreSQL & pgAdmin Demonstration (2:30 – 3:30)**
-  - Open **pgAdmin 4**, show the `sms_db` database, and display the `sms_app_smslog` table.
-- [ ] **Part 4: Live SMS Dispatch Walkthrough (3:30 – 5:30)**
-  - Navigate to `http://127.0.0.1:8000/`.
-  - Type a valid Philippine number (`09XXXXXXXXX`).
-  - Demonstrate the **live JavaScript character counter** and **smartphone preview bubble** updating in real time.
-  - Click **Send SMS Message**, observe the loading spinner, and show the success banner.
-- [ ] **Part 5: Input Validation & Error Handling (5:30 – 7:00)**
-  - Demonstrate form validation: enter an invalid phone number (`abc`), leave the message blank, and demonstrate inline validation error alerts.
-  - Trigger an intentional error (e.g., empty API key) to show that the system logs `FAILED` with status code without crashing.
-- [ ] **Part 6: History Dashboard & Django Admin (7:00 – 8:30)**
-  - Open `http://127.0.0.1:8000/history/`. Show filters (`SENT`, `FAILED`) and modal popups with raw gateway responses.
-  - Open `/admin/` to show Django's built-in administration interface for logs.
-- [ ] **Part 7: Summary & Conclusion (8:30 – 9:30)**
-  - Conclude by summarizing each member's contributions and what was learned regarding Django, REST API integration, and database management.
-
----
 
 ## 🔒 Security & Best Practices
 
